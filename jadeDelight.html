@@ -1,0 +1,284 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Jade Delight</title>
+<style type="text/css">
+	.reportError {
+		color: #ff0000; border: solid 1px #ff0000; display:none; width: 200px;
+	}
+
+</style>
+
+</head>
+
+<body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script language="javascript">
+
+function MenuItem(name, cost)
+{
+	this.name = name;
+	this.cost=cost;
+}
+
+menuItems = new Array(
+	new MenuItem("Chicken Chop Suey", 4.5),
+	new MenuItem("Sweet and Sour Pork", 6.25),
+	new MenuItem("Shrimp Lo Mein", 5.25),
+	new MenuItem("Moo Shi Chicken", 6.5),
+	new MenuItem("Fried Rice", 2.35)
+);
+
+function makeSelect(name, minRange, maxRange)
+{
+	var t= "";
+	t = "<select name='" + name + "' size='1'>";
+	for (j=minRange; j<=maxRange; j++)
+	   t += "<option>" + j + "</option>";
+	t+= "</select>";
+	return t;
+}
+var checkdisplay;
+var waitTime = 30;
+function check(){
+	if (document.getElementById('pickup').checked) {
+		document.getElementById('display').style.display = 'none';
+		checkdisplay = true;
+		waitTime = 15;
+		waitTime = parseFloat(waitTime);
+		
+	} else {
+		document.getElementById('display').style.display = 'block';
+	}
+	
+	if (document.getElementById('delivery').checked) {
+		document.getElementById('display').style.display = 'block';
+		checkdisplay = false
+		waitTime = parseFloat(waitTime);
+	} else {
+		document.getElementById('display').style.display = 'none';
+	}
+}
+</script>
+
+<h1>Jade Delight</h1>
+<form name="order">
+
+	<p>First Name: <input type="text"  name='fname' /></p>
+	<p>Last Name*:  <input type="text"  name='lname' /></p>
+		<p><div id="nameError" class="reportError">Please provide Last Name.</div></p>
+		<div id = "display">
+			<p>Street: <input type="text"  name='street'/>
+				<div id="streetError" class="reportError">Please provide Street Name.</div></p>
+			<p>City: <input type="text"  name='city'/>
+				<div id="cityError" class="reportError">Please provide City Name.</div></p>
+		</div>
+		
+	<p>Phone*: <input type="text"  name='phone'/>
+		<div id="noPhone" class="reportError">Please provide 9-digit phone number.</div>
+		<div id="phoneError" class="reportError">Phone number must be 9 digits.</div></p>
+	<p>
+		<input type="radio"  name="p_or_d" value = "pickup" checked="checked" id = "pickup" onclick="javascript:check();"/>Pickup  
+		<input type="radio"  name='p_or_d' value = 'delivery' checked="checked" id = "delivery" onclick="javascript:check();"/>Delivery
+	</p>
+	<table>
+		<tr>
+		<th>Select Item</th>
+		<th>Item Name</th>
+		<th>Cost Each</th>
+		<th>Total Cost</th>
+		</tr>
+		
+	<script language="javascript">
+	
+		var s = "";
+		for (i=0; i< menuItems.length; i++)
+		{
+			s += "<tr><td>";
+			s += makeSelect("quan" + i, 0, 10);
+			s += "</td><td>" + menuItems[i].name + "</td>";
+			s += "<td> $ " + menuItems[i].cost.toFixed(2) + "</td>";
+			s += "<td>$<input type='text' name='cost'/></td></tr>";
+		}
+		document.writeln(s);
+	</script>
+	</table>
+	<div id="noItem" class="reportError">Please choose at least one item.</div>
+	<p>Subtotal:
+		$<input type="text"  name='subtotal' id="subtotal" />
+	</p>
+	<p>Mass tax 6.25%:
+		$ <input type="text"  name='tax' id="tax" />
+	</p>
+	<p>Total: $ <input type="text"  name='total' id="total" />
+	</p>
+	
+	<input type = "button" value = "Submit Order" onclick="checkError()"/>
+	<a href="jade_delight2.html"><button>Order Something Else!</button></a>
+	
+	<script language ="javascript">
+		/*global variables */
+		var select = document.getElementsByTagName("select");
+		var costs = document.getElementsByName("cost");
+		var subtotal = document.getElementsByName("subtotal")[0];
+		var tax = document.getElementsByName("tax")[0];
+		var total = document.getElementsByName("total")[0];
+		var itemCounter = 0;
+		
+		determineSelectionValues();
+		
+		function calcValue(selection){
+			var value = select[selection].value;
+			costs[selection].value = (parseInt(value) * menuItems[selection].cost).toFixed(2);
+			calcTotals();
+			itemCounter++;
+		}
+	
+		/* calculates the tax, total, subtotal, based on items ordered */
+		function calcTotals(){
+			var sub = 0;
+			sub = 
+			(parseFloat(costs[0].value) || 0) + (parseFloat(costs[1].value) || 0) +
+			(parseFloat(costs[2].value) || 0) + (parseFloat(costs[3].value) || 0) +
+			(parseFloat(costs[4].value) || 0);
+			
+			subtotal.value = sub;
+			
+			tax.value = (parseFloat(sub) * 0.0625).toFixed(2);
+			total.value = (parseFloat(subtotal.value) + parseFloat(tax.value)).toFixed(2);
+		}
+	
+		/* makes sure all required fields are filled out */
+		function checkError(){
+			var foundError = false;
+			var result = findError(foundError);			
+			/* no errors, good to order */
+			if (result == false){
+				var finalOrder = "Please come again!" + "\n";
+				months=["January", "February","March","April","May","June","July",
+						"August","September","October","November","December"];
+				
+				finalOrder += "You ordered" + ordered() + "\n";
+			
+				var date = new Date();
+				month = months[date.getMonth()];
+				date.setMinutes(date.getMinutes() + waitTime);
+				
+				/* 
+				I genuinely can't get the 30 minutes to work properly when it crosses over the hour
+				As in 2:35 + 30 = 2:35 but mine says "2:5" I lose the 10s spot...
+				I've tested this so many times but can't figure out the condition to get it work
+				*/
+		
+				finalOrder += "Your order should be arrive around " + date.getHours() + ":" +
+				date.getMinutes() + " " + month +
+				" " + date.getDate() + " " + date.getFullYear() + "\n";
+				
+				finalOrder += "Your total $" + total.value + "\n";
+				
+				alert(finalOrder);
+				return !foundError;
+			}
+			
+		}
+		/* helper functions */
+		function validatePhone(input){
+			var phoneno = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+			if (input.match(phoneno)) {
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+	
+		function determineSelectionValues(){
+			
+			select[0].onchange = function(){
+				var selection = 0;
+				calcValue(selection);
+			}
+			select[1].onchange = function(){
+				var selection = 1;
+				calcValue(selection);
+			}
+			select[2].onchange = function(){
+				var selection = 2;
+				calcValue(selection);
+			}
+			select[3].onchange = function(){
+				var selection = 3;
+				calcValue(selection);
+			}
+			select[4].onchange = function(){
+				var selection = 4;
+				calcValue(selection);
+			}
+		}
+	
+		function findError(foundError){
+			
+			with(document.order){
+				if (lname.value == ""){
+					document.getElementById("nameError").style.display = "block";
+					lname.focus();
+					foundError=true;
+				}
+				
+				if (!checkdisplay){
+					if (street.value == ""){
+						document.getElementById("streetError").style.display = "block";
+						street.focus();
+						foundError=true;
+					}
+					if (city.value == ""){
+						document.getElementById("cityError").style.display = "block";
+						city.focus();
+						foundError=true;
+					}
+				}
+				
+				if (validatePhone(phone.value)){
+					document.getElementById("phoneError").style.display = "block";
+					phone.focus();
+					foundError=true;
+				}
+			}
+			
+			if (itemCounter == 0){
+				document.getElementById("noItem").style.display = "block";
+				foundError=true;
+			}
+			return foundError;
+		}
+	
+	
+		function ordered(){
+			var order = "";
+			if (parseInt(costs[0].value) > 0){
+					order += ", " + select[0].value + " " + menuItems[0].name;
+			}
+			
+			if (parseInt(costs[1].value) > 0){
+					order += ", " + select[1].value + " " + menuItems[1].name;
+			}
+			
+			if (parseInt(costs[2].value) > 0){
+					order += ", " + select[2].value + " " + menuItems[2].name;
+			}
+			
+			if (parseInt(costs[3].value) > 0){
+					order += ", " + select[3].value + " " + menuItems[3].name;
+			}
+			
+			if (parseInt(costs[4].value) > 0){
+					order += ", " + select[4].value + " " + menuItems[4].name;
+			}
+			return order;
+		}
+	</script>
+
+</form>
+</body>
+</html>
